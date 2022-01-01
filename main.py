@@ -4,13 +4,15 @@ import numpy as np
 from PIL import Image
 import onnxruntime as rt
 import cv2
+import warnings
+warnings.filterwarnings('ignore')
 
 EXPORT_MODEL_VERSION = 1
 
 
 class ONNXModel:
     def __init__(self, model_dir) -> None:
-        with open("signature.json", "r") as f:
+        with open(os.path.join(model_dir, "signature.json"), "r") as f:
             self.signature = json.load(f)
         self.model_file = self.signature.get("filename")
         if not os.path.isfile(self.model_file):
@@ -19,7 +21,8 @@ class ONNXModel:
         self.signature_outputs = self.signature.get("outputs")
         self.session = None
         if "Image" not in self.signature_inputs:
-            raise ValueError("ONNX model doesn't have 'Image' input! Check signature.json, and please report issue to Lobe.")
+            raise ValueError(
+                "ONNX model doesn't have 'Image' input! Check signature.json, and please report issue to Lobe.")
         version = self.signature.get("export_model_version")
         if version is None or version != EXPORT_MODEL_VERSION:
             print(
@@ -79,6 +82,7 @@ if __name__ == "__main__":
     outputs = model.predict(image)
     result = sorted(outputs["predictions"], key=lambda i: i["confidence"], reverse=True)[0]
     print(f"accuracy_of_all_class: {outputs}")
+    cv2.putText(get_image, f"{result['label']}->{str(round(result['confidence'] * 100, 2))}%", (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 1, cv2.LINE_AA)
     cv2.imshow('{}-{}%'.format(result["label"], str(round(result["confidence"] * 100, 2))), get_image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
