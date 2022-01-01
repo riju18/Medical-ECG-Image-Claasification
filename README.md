@@ -1,6 +1,10 @@
 # Medical-ECG-Image-Claasification
 The Deep Learning approach to classifying Normal Person heartbeat, abnormal heart rate, and Myocardial Infarction.
 
+# Caution:
+  + It's an experimental & learning project
+  + Don't use it in production
+
 # Steps to follow:
   + create python venv 
   + install requirements.txt file
